@@ -1,8 +1,8 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet";
-import Logo from "./Assets/2050058.png";
-import Image from "./Assets/info.png";
+import Logo from "./assets/2050058.png";
+import Image from "./assets/info.png";
 import axios from "axios";
 import "./styles.scss";
 
@@ -21,6 +21,7 @@ const InfoTable = () => {
     i18n.changeLanguage(e.target.value);
   };
   useEffect(() => {
+    let subscribed = true;
     const baseUrl =
       "https://coronavirus-monitor.p.rapidapi.com/coronavirus/cases_by_country.php";
     const headers = {
@@ -33,13 +34,17 @@ const InfoTable = () => {
         let ress = res.data.countries_stat.filter(
           countries => countries.country_name === "Morocco"
         );
-        setState({ ...state, data: [...state.data, ress[0]] });
+
+        if(subscribed) setState({ ...state, data: [...state.data, ress[0]] });
       } catch (error) {
-        setState({ ...state, hasError: true });
+        if(subscribed) setState({ ...state, hasError: true });
       }
     };
     if (!!state.data.length === false && state.hasError === false) {
       getData();
+    }
+    return () => {
+      subscribed = false
     }
   }, [state]);
 
